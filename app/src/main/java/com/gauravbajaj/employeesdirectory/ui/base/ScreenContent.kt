@@ -7,7 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.gauravbajaj.employeesdirectory.ui.components.ErrorMessage
+import com.gauravbajaj.employeesdirectory.ui.components.ErrorState
 import com.gauravbajaj.employeesdirectory.ui.components.LoadingIndicator
 
 /**
@@ -50,7 +50,7 @@ fun <T> ScreenContent(
             }
 
             is UIState.Error -> {
-                ErrorMessage(
+                ErrorState(
                     message = uiState.message,
                     onRetry = onRetry
                 )
