@@ -16,6 +16,7 @@ import com.gauravbajaj.employeesdirectory.data.model.Employee
 import com.gauravbajaj.employeesdirectory.ui.viewmodel.EmployeeListViewModel
 import com.gauravbajaj.employeesdirectory.ui.base.ScreenContent
 import com.gauravbajaj.employeesdirectory.ui.base.UIState
+import com.gauravbajaj.employeesdirectory.ui.components.EmptyState
 
 /**
  * Composable function for the Home Screen.
@@ -63,20 +64,25 @@ fun EmployeeListScreen(
         ) {
 
             val successState = uiState as UIState.Success
-
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(16.dp)
-            ) {
-                items(successState.data) { user ->
-                    Text(
-                        text = user.full_name,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onItemClick(user) }
-                            .padding(vertical = 8.dp)
-                    )
+            if (successState.data.isEmpty()) {
+                EmptyState({
+                    viewModel.loadEmployees()
+                })
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(16.dp)
+                ) {
+                    items(successState.data) { user ->
+                        Text(
+                            text = user.full_name,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onItemClick(user) }
+                                .padding(vertical = 8.dp)
+                        )
+                    }
                 }
             }
         }
