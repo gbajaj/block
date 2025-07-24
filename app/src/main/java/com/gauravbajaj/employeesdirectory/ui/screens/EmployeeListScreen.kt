@@ -32,7 +32,7 @@ import com.gauravbajaj.employeesdirectory.ui.components.EmptyState
 import com.gauravbajaj.employeesdirectory.ui.viewmodel.EmployeeListViewModel
 
 /**
- * Composable function for the Home Screen.
+ * Composable function for the EmployeeListScreen.
  *
  * This screen displays a list of users fetched from a ViewModel.
  * It handles different UI states (Initial, Loading, Success, Error)
