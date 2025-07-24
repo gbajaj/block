@@ -6,7 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import com.gauravbajaj.employeesdirectory.navigation.employeeddirectoryNavHost
-import com.gauravbajaj.employeesdirectory.ui.theme.employeedirectoryTheme
+import com.gauravbajaj.employeesdirectory.ui.theme.EmployeeDirectoryTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -15,7 +15,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            employeedirectoryTheme {
+            EmployeeDirectoryTheme {
                 employeeddirectoryNavHost()
             }
         }
@@ -29,7 +29,7 @@ fun employeesdirectoryApp() {
 
 @Composable
 fun employeesdirectoryPreview() {
-    employeedirectoryTheme {
+    EmployeeDirectoryTheme {
         employeesdirectoryApp()
     }
 }
