@@ -88,7 +88,10 @@ dependencies {
     // Unit Testing
     testImplementation(libs.junit) // JUnit framework for unit testing
     testImplementation(libs.turbine) // Testing Flow emissions
-
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.androidx.core.testing)
     // Android Instrumentation Testing (UI & Integration)
     androidTestImplementation(libs.androidx.junit) // AndroidX Test Library for JUnit
     androidTestImplementation(libs.androidx.espresso.core) // Espresso for UI testing
