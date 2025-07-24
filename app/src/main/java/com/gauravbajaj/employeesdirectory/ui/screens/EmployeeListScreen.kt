@@ -32,7 +32,7 @@ import com.gauravbajaj.employeesdirectory.ui.base.UIState
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(
+fun EmployeeListScreen(
     navController: NavController,
     modifier: Modifier = Modifier,
     onItemClick: (Employee) -> Unit = {}

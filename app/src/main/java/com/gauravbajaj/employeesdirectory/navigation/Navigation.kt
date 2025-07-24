@@ -7,7 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.gauravbajaj.employeesdirectory.data.model.Employee
 import com.gauravbajaj.employeesdirectory.ui.screens.DetailsScreen
-import com.gauravbajaj.employeesdirectory.ui.screens.HomeScreen
+import com.gauravbajaj.employeesdirectory.ui.screens.EmployeeListScreen
 
 /**
  * Composable function that defines the navigation graph for the employeedirectory app.
@@ -32,7 +32,7 @@ fun employeeddirectoryNavHost(
         startDestination = startDestination
     ) {
         composable(Screen.Home.route) {
-            HomeScreen(navController = navController, onItemClick = { user ->
+            EmployeeListScreen(navController = navController, onItemClick = { user ->
                 navController.currentBackStackEntry?.savedStateHandle?.set("user", user)
                 navController.navigate(Screen.Details.route)
             })
