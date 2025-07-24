@@ -70,8 +70,6 @@ object AppModule {
     @Singleton
     fun provideUserRepository(
         userApi: EmployeesApiService,
-        @ApplicationContext context: Context,
-        moshi: Moshi
     ): EmployeesRepository =
-        EmployeesRepository(userApi, context, moshi)
+        EmployeesRepository(userApi)
 }

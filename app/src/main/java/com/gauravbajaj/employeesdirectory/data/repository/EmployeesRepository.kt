@@ -1,15 +1,13 @@
 package com.gauravbajaj.employeesdirectory.data.repository
 
-import android.content.Context
 import com.gauravbajaj.employeesdirectory.data.ApiResult
 import com.gauravbajaj.employeesdirectory.data.api.EmployeesApiService
 import com.gauravbajaj.employeesdirectory.data.model.Employee
 import com.squareup.moshi.Moshi
-import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Repository for fetching user data.
@@ -20,14 +18,10 @@ import kotlinx.coroutines.flow.flow
  *
  * @property employeesApi The API service for user-related network calls.
  * @property context The application context, used to access resources.
- * @property moshi The Moshi instance for JSON serialization and deserialization.
  */
 @Singleton
 class EmployeesRepository @Inject constructor(
     private val employeesApi: EmployeesApiService,
-    @ApplicationContext
-    private val context: Context,
-    private val moshi: Moshi
 ) {
     fun getEmployees(): Flow<ApiResult<List<Employee>>> = flow {
         emit(ApiResult.Loading())
