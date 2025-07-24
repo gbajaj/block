@@ -13,7 +13,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.gauravbajaj.employeesdirectory.data.model.Employee
-import com.gauravbajaj.employeesdirectory.ui.viewmodel.HomeViewModel
+import com.gauravbajaj.employeesdirectory.ui.viewmodel.EmployeeListViewModel
 import com.gauravbajaj.employeesdirectory.ui.base.ScreenContent
 import com.gauravbajaj.employeesdirectory.ui.base.UIState
 
@@ -37,7 +37,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     onItemClick: (Employee) -> Unit = {}
 ) {
-    val viewModel = hiltViewModel<HomeViewModel>()
+    val viewModel = hiltViewModel<EmployeeListViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     LaunchedEffect(uiState) {
         if (uiState is UIState.Initial) {

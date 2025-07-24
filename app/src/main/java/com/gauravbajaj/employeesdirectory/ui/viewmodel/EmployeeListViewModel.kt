@@ -11,9 +11,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
+/**
+ * A [ViewModel] responsible for loading the list of employees from the API
+ * and updating the UI state accordingly.
+ *
+ * This ViewModel uses [EmployeesRepository] to fetch the list of employees
+ * and [StateFlow] to maintain and update the UI state.
+ *
+ * The [uiState] StateFlow can be observed by Activities or Fragments to
+ * react to changes in the UI state.
+ */
 @HiltViewModel
-class HomeViewModel @Inject constructor(
+class EmployeeListViewModel @Inject constructor(
     private val employeeRepository: EmployeesRepository
 ) : ViewModel() {
 
