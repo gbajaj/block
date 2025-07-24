@@ -53,6 +53,7 @@ fun <T> ScreenContent(
                 ErrorState(
                     message = uiState.message,
                     onRetry = onRetry,
+                    modifier = Modifier.align(Alignment.Center)
                 )
             }
         }
