@@ -1,6 +1,8 @@
 package com.gauravbajaj.employeesdirectory.data.api
 
 import com.gauravbajaj.employeesdirectory.data.model.Employee
+import com.gauravbajaj.employeesdirectory.data.model.EmployeesResponse
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 
@@ -9,9 +11,13 @@ import retrofit2.http.Path
  * This interface is used by Retrofit to generate the network request implementations.
  */
 interface EmployeesApiService {
-    @GET("users/{userId}")
-    suspend fun getUser(@Path("userId") userId: String): Employee
+    @GET("employees.json")
+    suspend fun getEmployees(): Response<EmployeesResponse>
 
-    @GET("users")
-    suspend fun getUsers(): List<Employee>
+    @GET("employees_malformed.json")
+    suspend fun getMalformedEmployees(): Response<EmployeesResponse>
+
+
+    @GET("employees_empty.json")
+    suspend fun getEmptyEmployees(): Response<EmployeesResponse>
 }

@@ -30,18 +30,10 @@ class EmployeesRepository @Inject constructor(
 ) {
     fun getUsers(): Flow<List<Employee>> = flow {
         try {
-//            emit(userApi.getUsers())
+//            emit(employeesApi.getEmployees())
 
         } catch (e: Exception) {
             throw Exception("Failed to fetch users", e)
-        }
-    }
-
-    fun getUser(userId: String): Flow<Employee> = flow {
-        try {
-            emit(employeesApi.getUser(userId))
-        } catch (e: Exception) {
-            throw Exception("Failed to fetch user", e)
         }
     }
 

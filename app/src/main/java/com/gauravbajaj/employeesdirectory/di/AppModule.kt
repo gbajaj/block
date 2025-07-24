@@ -24,7 +24,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-    private const val BASE_URL = "https://api.example.com/"
+    private const val BASE_URL = "https://s3.amazonaws.com/sq-mobile-interview/"
 
     @Provides
     @Singleton
@@ -63,7 +63,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideUserApi(retrofit: Retrofit): EmployeesApiService =
+    fun provideEmployeesApiService(retrofit: Retrofit): EmployeesApiService =
         retrofit.create(EmployeesApiService::class.java)
 
     @Provides
