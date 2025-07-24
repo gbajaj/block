@@ -41,7 +41,7 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     LaunchedEffect(uiState) {
         if (uiState is UIState.Initial) {
-            viewModel.loadUsers()
+            viewModel.loadEmployees()
         }
     }
     Scaffold(
@@ -58,7 +58,7 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(paddingValues),
             onRetry = {
-                viewModel.loadUsers()
+                viewModel.loadEmployees()
             }
         ) {
 

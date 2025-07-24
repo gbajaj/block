@@ -2,6 +2,7 @@ package com.gauravbajaj.employeesdirectory.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gauravbajaj.employeesdirectory.data.ApiResult
 import com.gauravbajaj.employeesdirectory.data.model.Employee
 import com.gauravbajaj.employeesdirectory.data.repository.EmployeesRepository
 import com.gauravbajaj.employeesdirectory.ui.base.UIState
@@ -13,23 +14,30 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val userRepository: EmployeesRepository
+    private val employeeRepository: EmployeesRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<UIState<List<Employee>>>(UIState.Initial)
     val uiState: StateFlow<UIState<List<Employee>>> = _uiState
 
-    fun loadUsers() {
-        viewModelScope.launch {
-            _uiState.value = UIState.Loading
-            try {
-                userRepository.getEmployees()
-                    .collect { employeesResult ->
+    init {
+        loadEmployees()
+    }
 
-//                        _uiState.value = UIState.Success(employeesResult ?: emptyList())
+    fun loadEmployees() {
+        viewModelScope.launch {
+            employeeRepository.getEmployees().collect { result ->
+                when (result) {
+                    is ApiResult.Loading -> {
+                        _uiState.value = UIState.Loading
                     }
-            } catch (e: Exception) {
-                _uiState.value = UIState.Error(e.message ?: "Failed to load users")
+                    is ApiResult.Success -> {
+                        _uiState.value = UIState.Success (result.data)
+                    }
+                    is ApiResult.Error -> {
+                        _uiState.value = UIState.Error (result.message)
+                    }
+                }
             }
         }
     }
