@@ -1,10 +1,8 @@
-package com.gauravbajaj.employeesdirectory.data.api
+package com.gauravbajaj.employeesdirectory.data.remote
 
-import com.gauravbajaj.employeesdirectory.data.model.Employee
 import com.gauravbajaj.employeesdirectory.data.model.EmployeesResponse
 import retrofit2.Response
 import retrofit2.http.GET
-import retrofit2.http.Path
 
 /**
  * Interface defining the API endpoints for user-related operations.

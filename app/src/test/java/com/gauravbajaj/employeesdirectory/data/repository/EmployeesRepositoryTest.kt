@@ -2,7 +2,7 @@ package com.gauravbajaj.employeesdirectory.data.repository
 
 import app.cash.turbine.test
 import com.gauravbajaj.employeesdirectory.data.ApiResult
-import com.gauravbajaj.employeesdirectory.data.api.EmployeesApiService
+import com.gauravbajaj.employeesdirectory.data.remote.EmployeesApiService
 import com.gauravbajaj.employeesdirectory.data.model.Employee
 import com.gauravbajaj.employeesdirectory.data.model.EmployeeType
 import com.gauravbajaj.employeesdirectory.data.model.EmployeesResponse

@@ -1,7 +1,7 @@
 package com.gauravbajaj.employeesdirectory.data.repository
 
 import com.gauravbajaj.employeesdirectory.data.ApiResult
-import com.gauravbajaj.employeesdirectory.data.api.EmployeesApiService
+import com.gauravbajaj.employeesdirectory.data.remote.EmployeesApiService
 import com.gauravbajaj.employeesdirectory.data.model.Employee
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.flow.Flow
