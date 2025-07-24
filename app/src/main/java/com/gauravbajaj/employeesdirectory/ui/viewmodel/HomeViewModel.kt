@@ -23,9 +23,10 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = UIState.Loading
             try {
-                userRepository.getUsers()
-                    .collect { users ->
-                        _uiState.value = UIState.Success(users)
+                userRepository.getEmployees()
+                    .collect { employeesResult ->
+
+//                        _uiState.value = UIState.Success(employeesResult ?: emptyList())
                     }
             } catch (e: Exception) {
                 _uiState.value = UIState.Error(e.message ?: "Failed to load users")

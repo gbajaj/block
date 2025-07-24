@@ -1,6 +1,7 @@
 package com.gauravbajaj.employeesdirectory.data.repository
 
 import android.content.Context
+import com.gauravbajaj.employeesdirectory.data.ApiResult
 import com.gauravbajaj.employeesdirectory.data.api.EmployeesApiService
 import com.gauravbajaj.employeesdirectory.data.model.Employee
 import com.squareup.moshi.Moshi
@@ -28,12 +29,18 @@ class EmployeesRepository @Inject constructor(
     private val context: Context,
     private val moshi: Moshi
 ) {
-    fun getUsers(): Flow<List<Employee>> = flow {
+    fun getEmployees(): Flow<ApiResult<List<Employee>>> = flow {
+        emit(ApiResult.Loading())
         try {
-//            emit(employeesApi.getEmployees())
-
+            val response = employeesApi.getEmployees()
+            if (response.isSuccessful) {
+                val employees = response.body()?.employees ?: emptyList()
+                emit(ApiResult.Success(employees))
+            } else {
+                emit(ApiResult.Error("Failed to load employees: ${response.message()}"))
+            }
         } catch (e: Exception) {
-            throw Exception("Failed to fetch users", e)
+            emit(ApiResult.Error("Network error: ${e.message}"))
         }
     }
 
