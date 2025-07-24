@@ -16,6 +16,7 @@ import com.gauravbajaj.employeesdirectory.data.model.Employee
 import com.gauravbajaj.employeesdirectory.ui.viewmodel.EmployeeListViewModel
 import com.gauravbajaj.employeesdirectory.ui.base.ScreenContent
 import com.gauravbajaj.employeesdirectory.ui.base.UIState
+import com.gauravbajaj.employeesdirectory.ui.components.EmployeeCard
 import com.gauravbajaj.employeesdirectory.ui.components.EmptyState
 
 /**
@@ -71,17 +72,14 @@ fun EmployeeListScreen(
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp)
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(successState.data) { user ->
-                        Text(
-                            text = user.full_name,
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { onItemClick(user) }
-                                .padding(vertical = 8.dp)
-                        )
+                    items(
+                        items = successState.data,
+                        key = { it.uuid }
+                    ) { employee ->
+                        EmployeeCard(employee = employee)
                     }
                 }
             }

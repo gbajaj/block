@@ -52,7 +52,7 @@ fun <T> ScreenContent(
             is UIState.Error -> {
                 ErrorState(
                     message = uiState.message,
-                    onRetry = onRetry
+                    onRetry = onRetry,
                 )
             }
         }
