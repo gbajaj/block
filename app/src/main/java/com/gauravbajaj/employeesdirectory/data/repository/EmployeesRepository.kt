@@ -8,6 +8,15 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 import javax.inject.Singleton
+import retrofit2.HttpException
+import java.io.IOException
+import java.net.ConnectException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
+
+import com.gauravbajaj.employeesdirectory.data.ApiException
+import com.squareup.moshi.JsonDataException
+
 
 /**
  * Repository for fetching user data.
@@ -29,12 +38,54 @@ class EmployeesRepository @Inject constructor(
             val response = employeesApi.getEmployees()
             if (response.isSuccessful) {
                 val employees = response.body()?.employees ?: emptyList()
-                emit(ApiResult.Success(employees))
+
+                // Validate employee data
+                val validEmployees = employees.filter { employee ->
+                    employee.uuid.isNotBlank() &&
+                            employee.full_name.isNotBlank() &&
+                            employee.email_address.isNotBlank() &&
+                            employee.team.isNotBlank()
+                }
+
+                if (validEmployees.size != employees.size) {
+                    emit(
+                        ApiResult.Error(
+                            ApiException.ParseException(
+                                IllegalStateException("Some employee records are malformed")
+                            )
+                        )
+                    )
+                    return@flow
+                }
+                emit(ApiResult.Success(validEmployees))
             } else {
-                emit(ApiResult.Error("Failed to load employees: ${response.message()}"))
+                emit(
+                    ApiResult.Error(
+                        ApiException.ServerException(
+                            code = response.code(),
+                            serverMessage = response.message()
+                        )
+                    )
+                )
             }
         } catch (e: Exception) {
-            emit(ApiResult.Error("Network error: ${e.message}"))
+            val apiException = when (e) {
+                is HttpException -> ApiException.ServerException(
+                    code = e.code(),
+                    serverMessage = e.message()
+                )
+
+                is UnknownHostException,
+                is JsonDataException -> ApiException.ParseException(e)
+
+                is ConnectException -> ApiException.NetworkException(e)
+
+                is SocketTimeoutException -> ApiException.NetworkException(e)
+                is IOException -> ApiException.NetworkException(e)
+                else -> ApiException.UnknownException(e)
+
+            }
+            emit(ApiResult.Error(apiException))
         }
     }
 

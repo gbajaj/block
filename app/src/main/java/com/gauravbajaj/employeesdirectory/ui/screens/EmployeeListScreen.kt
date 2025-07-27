@@ -88,14 +88,14 @@ fun EmployeeListScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .pullRefresh(pullRefreshState).padding(paddingValues),
+                .pullRefresh(pullRefreshState)
+                .padding(paddingValues),
             contentAlignment = Alignment.Center
         ) {
             when (uiState) {
                 UIState.Initial -> {
-                    Text(
-                        text = "No content yet",
-                        style = MaterialTheme.typography.bodyLarge,
+                    EmptyState(
+                        onRetry = { viewModel.retry() },
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
@@ -103,9 +103,12 @@ fun EmployeeListScreen(
                 is UIState.Success -> {
                     val successState = uiState as UIState.Success
                     if (successState.data.isEmpty()) {
-                        EmptyState({
-                            viewModel.loadEmployees()
-                        })
+                        EmptyState(
+                            {
+                                viewModel.loadEmployees()
+                            },
+                            modifier = Modifier.align(Alignment.Center)
+                        )
                     } else {
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
@@ -125,11 +128,12 @@ fun EmployeeListScreen(
                 is UIState.Error -> {
                     val successState = uiState as UIState.Error
                     ErrorState(
-                        message = successState.message,
-                        onRetry = { viewModel.loadEmployees() },
+                        error = successState,
+                        onRetry = { viewModel.retry() },
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
+
                 else -> {
                     // Pull to refresh would handle the loading state
                 }
