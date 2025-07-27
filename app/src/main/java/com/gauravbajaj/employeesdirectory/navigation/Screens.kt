@@ -9,6 +9,5 @@ package com.gauravbajaj.employeesdirectory.navigation
  * @property route The unique route identifier for the screen.
  */
 sealed class Screen(val route: String) {
-    object Home : Screen("home")
-    object Details : Screen("details")
+    data object Home : Screen("home")
 }
