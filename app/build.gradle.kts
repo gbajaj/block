@@ -59,6 +59,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling) // Debug implementation for Compose tooling
     implementation(libs.androidx.material3) // Material Design 3 components for Compose
     implementation(libs.androidx.material.icons.extended.v143)// Extended Material Icons for Compose
+    implementation(libs.androidx.material) // Material (for pull refresh specifically)
 
     // Dependency Injection - Hilt
     implementation(libs.hilt.android)

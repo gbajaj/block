@@ -32,10 +32,7 @@ fun employeeddirectoryNavHost(
         startDestination = startDestination
     ) {
         composable(Screen.Home.route) {
-            EmployeeListScreen(navController = navController, onItemClick = { user ->
-                navController.currentBackStackEntry?.savedStateHandle?.set("user", user)
-                navController.navigate(Screen.Details.route)
-            })
+            EmployeeListScreen()
         }
 
         composable(
