@@ -21,9 +21,11 @@ A modern Android employee directory app built with Jetpack Compose, demonstratin
 <p float="left">
 
 <img width="300" alt="Working" src="https://github.com/user-attachments/assets/6c106558-129a-4392-9263-38df64c95890" />
+<img width="300"  alt="empty" src="https://github.com/user-attachments/assets/c1017d18-c7c2-48e1-8510-bb021b2877a1" />
 <img width="300" alt="p_t_refersh" src="https://github.com/user-attachments/assets/1a9bad5d-42e0-4e8a-a359-09f64b3e29bc" />
 <img width="300" alt="Network Test" src="https://github.com/user-attachments/assets/ca47a31f-e948-4c41-bd3b-27269f2c8bef" />
 <img width="300" alt="Malformed" src="https://github.com/user-attachments/assets/89de0951-50db-4fb5-9cd4-05fda8a79572" />
+
 </p>
 ## Build tools & versions used
 
