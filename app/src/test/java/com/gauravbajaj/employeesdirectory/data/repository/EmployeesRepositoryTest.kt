@@ -13,9 +13,6 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.whenever
 import retrofit2.HttpException
 import retrofit2.Response
 import java.io.IOException
@@ -24,11 +21,11 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import com.gauravbajaj.employeesdirectory.data.FakeEmployeesApiService
 
 class EmployeesRepositoryTest {
 
-    @Mock
-    private lateinit var apiService: EmployeesApiService
+    private lateinit var apiService: FakeEmployeesApiService
 
     private lateinit var repository: EmployeesRepository
 
@@ -119,7 +116,7 @@ class EmployeesRepositoryTest {
 
     @Before
     fun setup() {
-        MockitoAnnotations.openMocks(this)
+        apiService = FakeEmployeesApiService()
         repository = EmployeesRepository(apiService)
     }
 
@@ -131,7 +128,7 @@ class EmployeesRepositoryTest {
         runTest {
             // Given
             val response = EmployeesResponse(listOf(validEmployee))
-            whenever(apiService.getEmployees()).thenReturn(Response.success(response))
+            apiService.employeesResponse = Response.success(response)
 
             // When & Then
             repository.getEmployees().test {
@@ -156,7 +153,7 @@ class EmployeesRepositoryTest {
             // Given
             val employees = listOf(validEmployee, validEmployeeMinimal, contractorEmployee)
             val response = EmployeesResponse(employees)
-            whenever(apiService.getEmployees()).thenReturn(Response.success(response))
+            apiService.employeesResponse = Response.success(response)
 
             // When & Then
             repository.getEmployees().test {
@@ -177,7 +174,7 @@ class EmployeesRepositoryTest {
         runTest {
             // Given
             val emptyResponse = EmployeesResponse(emptyList())
-            whenever(apiService.getEmployees()).thenReturn(Response.success(emptyResponse))
+            apiService.employeesResponse = Response.success(emptyResponse)
 
             // When & Then
             repository.getEmployees().test {
@@ -195,7 +192,7 @@ class EmployeesRepositoryTest {
     @Test
     fun `getEmployees should handle null response body gracefully`() = runTest {
         // Given
-        whenever(apiService.getEmployees()).thenReturn(Response.success(null))
+        apiService.employeesResponse = Response.success(null)
 
         // When & Then
         repository.getEmployees().test {
@@ -217,7 +214,7 @@ class EmployeesRepositoryTest {
         // Given
         val employees = listOf(validEmployee, invalidEmployeeEmptyUuid, validEmployeeMinimal)
         val response = EmployeesResponse(employees)
-        whenever(apiService.getEmployees()).thenReturn(Response.success(response))
+        apiService.employeesResponse = Response.success(response)
 
         // When & Then
         repository.getEmployees().test {
@@ -238,7 +235,7 @@ class EmployeesRepositoryTest {
         // Given
         val employees = listOf(validEmployee, invalidEmployeeEmptyName)
         val response = EmployeesResponse(employees)
-        whenever(apiService.getEmployees()).thenReturn(Response.success(response))
+        apiService.employeesResponse = Response.success(response)
 
         // When & Then
         repository.getEmployees().test {
@@ -258,7 +255,7 @@ class EmployeesRepositoryTest {
         // Given
         val employees = listOf(validEmployee, invalidEmployeeEmptyEmail)
         val response = EmployeesResponse(employees)
-        whenever(apiService.getEmployees()).thenReturn(Response.success(response))
+        apiService.employeesResponse = Response.success(response)
 
         // When & Then
         repository.getEmployees().test {
@@ -278,7 +275,7 @@ class EmployeesRepositoryTest {
         // Given
         val employees = listOf(validEmployee, invalidEmployeeEmptyTeam)
         val response = EmployeesResponse(employees)
-        whenever(apiService.getEmployees()).thenReturn(Response.success(response))
+        apiService.employeesResponse = Response.success(response)
 
         // When & Then
         repository.getEmployees().test {
@@ -303,7 +300,7 @@ class EmployeesRepositoryTest {
             invalidEmployeeEmptyTeam
         )
         val response = EmployeesResponse(malformedEmployees)
-        whenever(apiService.getEmployees()).thenReturn(Response.success(response))
+        apiService.employeesResponse = Response.success(response)
 
         // When & Then
         repository.getEmployees().test {
@@ -324,7 +321,7 @@ class EmployeesRepositoryTest {
     fun `getEmployees should emit server error for 404 response`() = runTest {
         // Given
         val errorBody = "Not Found".toResponseBody("text/plain".toMediaType())
-        whenever(apiService.getEmployees()).thenReturn(Response.error(404, errorBody))
+        apiService.employeesResponse = Response.error(404, errorBody)
 
         // When & Then
         repository.getEmployees().test {
@@ -344,7 +341,7 @@ class EmployeesRepositoryTest {
     fun `getEmployees should emit server error for 500 response`() = runTest {
         // Given
         val errorBody = "Internal Server Error".toResponseBody("text/plain".toMediaType())
-        whenever(apiService.getEmployees()).thenReturn(Response.error(500, errorBody))
+        apiService.employeesResponse = Response.error(500, errorBody)
 
         // When & Then
         repository.getEmployees().test {
@@ -368,7 +365,7 @@ class EmployeesRepositoryTest {
     fun `getEmployees should emit server error for 503 response`() = runTest {
         // Given
         val errorBody = "Service Unavailable".toResponseBody("text/plain".toMediaType())
-        whenever(apiService.getEmployees()).thenReturn(Response.error(503, errorBody))
+        apiService.employeesResponse = Response.error(503, errorBody)
 
         // When & Then
         repository.getEmployees().test {
@@ -393,7 +390,7 @@ class EmployeesRepositoryTest {
                 "Unauthorized".toResponseBody("text/plain".toMediaType())
             )
         )
-        whenever(apiService.getEmployees()).thenThrow(httpException)
+        apiService.exceptionToThrow = httpException
 
         // When & Then
         repository.getEmployees().test {
@@ -411,86 +408,86 @@ class EmployeesRepositoryTest {
 
     // ===== NETWORK ERROR SCENARIOS =====
 
-//    @Test
-//    fun `getEmployees should emit network error for UnknownHostException`() = runTest {
-//        // Given
-//        whenever(apiService.getEmployees()).thenThrow(UnknownHostException("Unable to resolve host"))
-//
-//        // When & Then
-//        repository.getEmployees().test {
-//            val loadingItem = awaitItem()
-//            assertTrue(loadingItem is ApiResult.Loading)
-//
-//            val errorItem = awaitItem()
-//            assertTrue(errorItem is ApiResult.Error)
-//            assertTrue(errorItem.exception is ApiException.NetworkException)
-//            assertEquals("Please check your internet connection and try again", errorItem.message)
-//
-//            awaitComplete()
-//        }
-//    }
-//
-//    @Test
-//    fun `getEmployees should emit network error for ConnectException`() = runTest {
-//        // Given
-//        whenever(apiService.getEmployees()).thenThrow(ConnectException("Connection refused"))
-//
-//        // When & Then
-//        repository.getEmployees().test {
-//            val loadingItem = awaitItem()
-//            assertTrue(loadingItem is ApiResult.Loading)
-//
-//            val errorItem = awaitItem()
-//            assertTrue(errorItem is ApiResult.Error)
-//            assertTrue(errorItem.exception is ApiException.NetworkException)
-//            assertEquals("Please check your internet connection and try again", errorItem.message)
-//
-//            awaitComplete()
-//        }
-//    }
-//
-//    @Test
-//    fun `getEmployees should emit network error for SocketTimeoutException`() = runTest {
-//        // Given
-//        whenever(apiService.getEmployees()).thenThrow(SocketTimeoutException("Read timed out"))
-//
-//        // When & Then
-//        repository.getEmployees().test {
-//            val loadingItem = awaitItem()
-//            assertTrue(loadingItem is ApiResult.Loading)
-//
-//            val errorItem = awaitItem()
-//            assertTrue(errorItem is ApiResult.Error)
-//            assertTrue(errorItem.exception is ApiException.NetworkException)
-//
-//            awaitComplete()
-//        }
-//    }
-//
-//    @Test
-//    fun `getEmployees should emit network error for IOException`() = runTest {
-//        // Given
-//        whenever(apiService.getEmployees()).thenThrow(IOException("Network error"))
-//
-//        // When & Then
-//        repository.getEmployees().test {
-//            val loadingItem = awaitItem()
-//            assertTrue(loadingItem is ApiResult.Loading)
-//
-//            val errorItem = awaitItem()
-//            assertTrue(errorItem is ApiResult.Error)
-//            assertTrue(errorItem.exception is ApiException.NetworkException)
-//
-//            awaitComplete()
-//        }
-//    }
+    @Test
+    fun `getEmployees should emit network error for UnknownHostException`() = runTest {
+        // Given
+        apiService.exceptionToThrow = UnknownHostException("Unable to resolve host")
+
+        // When & Then
+        repository.getEmployees().test {
+            val loadingItem = awaitItem()
+            assertTrue(loadingItem is ApiResult.Loading)
+
+            val errorItem = awaitItem()
+            assertTrue(errorItem is ApiResult.Error)
+            assertTrue(errorItem.exception is ApiException.NetworkException)
+            assertEquals("Please check your internet connection and try again", errorItem.message)
+
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `getEmployees should emit network error for ConnectException`() = runTest {
+        // Given
+        apiService.exceptionToThrow = ConnectException("Connection refused")
+
+        // When & Then
+        repository.getEmployees().test {
+            val loadingItem = awaitItem()
+            assertTrue(loadingItem is ApiResult.Loading)
+
+            val errorItem = awaitItem()
+            assertTrue(errorItem is ApiResult.Error)
+            assertTrue(errorItem.exception is ApiException.NetworkException)
+            assertEquals("Please check your internet connection and try again", errorItem.message)
+
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `getEmployees should emit network error for SocketTimeoutException`() = runTest {
+        // Given
+        apiService.exceptionToThrow = SocketTimeoutException("Read timed out")
+
+        // When & Then
+        repository.getEmployees().test {
+            val loadingItem = awaitItem()
+            assertTrue(loadingItem is ApiResult.Loading)
+
+            val errorItem = awaitItem()
+            assertTrue(errorItem is ApiResult.Error)
+            assertTrue(errorItem.exception is ApiException.NetworkException)
+
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `getEmployees should emit network error for IOException`() = runTest {
+        // Given
+        apiService.exceptionToThrow = IOException("Network error")
+
+        // When & Then
+        repository.getEmployees().test {
+            val loadingItem = awaitItem()
+            assertTrue(loadingItem is ApiResult.Loading)
+
+            val errorItem = awaitItem()
+            assertTrue(errorItem is ApiResult.Error)
+            assertTrue(errorItem.exception is ApiException.NetworkException)
+
+            awaitComplete()
+        }
+    }
 
     // ===== PARSING ERROR SCENARIOS =====
 
     @Test
     fun `getEmployees should emit parse error for JsonDataException`() = runTest {
         // Given
-        whenever(apiService.getEmployees()).thenThrow(JsonDataException("Malformed JSON"))
+        apiService.exceptionToThrow = JsonDataException("Malformed JSON")
 
         // When & Then
         repository.getEmployees().test {
@@ -511,7 +508,7 @@ class EmployeesRepositoryTest {
     @Test
     fun `getEmployees should emit unknown error for unexpected exceptions`() = runTest {
         // Given
-        whenever(apiService.getEmployees()).thenThrow(RuntimeException("Unexpected error"))
+        apiService.exceptionToThrow = RuntimeException("Unexpected error")
 
         // When & Then
         repository.getEmployees().test {
@@ -530,7 +527,7 @@ class EmployeesRepositoryTest {
     @Test
     fun `getEmployees should emit unknown error for IllegalStateException`() = runTest {
         // Given
-        whenever(apiService.getEmployees()).thenThrow(IllegalStateException("Invalid state"))
+        apiService.exceptionToThrow = IllegalStateException("Invalid state")
 
         // When & Then
         repository.getEmployees().test {
@@ -564,7 +561,7 @@ class EmployeesRepositoryTest {
             invalidEmployeeEmptyTeam  // Invalid
         )
         val response = EmployeesResponse(mixedEmployees)
-        whenever(apiService.getEmployees()).thenReturn(Response.success(response))
+        apiService.employeesResponse = Response.success(response)
 
         // When & Then
         repository.getEmployees().test {
@@ -589,7 +586,7 @@ class EmployeesRepositoryTest {
             contractorEmployee.copy(employee_type = EmployeeType.CONTRACTOR)
         )
         val response = EmployeesResponse(employeesWithAllTypes)
-        whenever(apiService.getEmployees()).thenReturn(Response.success(response))
+        apiService.employeesResponse = Response.success(response)
 
         // When & Then
         repository.getEmployees().test {
@@ -610,3 +607,21 @@ class EmployeesRepositoryTest {
         }
     }
 }
+
+//class FakeEmployeesApiService : EmployeesApiService {
+//    var employeesResponse: Response<EmployeesResponse>? = null
+//    var exceptionToThrow: Throwable? = null
+//
+//    override suspend fun getEmployees(): Response<EmployeesResponse> {
+//        exceptionToThrow?.let { throw it }
+//        return employeesResponse ?: Response.success(EmployeesResponse(emptyList()))
+//    }
+//
+//    override suspend fun getMalformedEmployees(): Response<EmployeesResponse> {
+//        return Response.success(EmployeesResponse(emptyList()))
+//    }
+//
+//    override suspend fun getEmptyEmployees(): Response<EmployeesResponse> {
+//        return Response.success(EmployeesResponse(emptyList()))
+//    }
+//}

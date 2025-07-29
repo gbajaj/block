@@ -74,16 +74,13 @@ class EmployeesRepository @Inject constructor(
                     code = e.code(),
                     serverMessage = e.message()
                 )
-
                 is UnknownHostException,
-                is JsonDataException -> ApiException.ParseException(e)
-
                 is ConnectException -> ApiException.NetworkException(e)
 
                 is SocketTimeoutException -> ApiException.NetworkException(e)
                 is IOException -> ApiException.NetworkException(e)
+                is JsonDataException -> ApiException.ParseException(e)
                 else -> ApiException.UnknownException(e)
-
             }
             emit(ApiResult.Error(apiException))
         }
