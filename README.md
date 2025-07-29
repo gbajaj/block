@@ -1,6 +1,6 @@
 
 
-# 🚀 employeedirectory: Android Interview Project Skeleton (Kotlin, Jetpack Compose, MVVM)
+# 🚀 employeedirectory: Take Home Android Interview Project for Block (Kotlin, Jetpack Compose, MVVM)
 
 ![MVVM Architecture](https://github.com/user-attachments/assets/f01ea363-b6ac-46e3-90f3-60915d08b05f)
 # Square Employee Directory
@@ -207,7 +207,7 @@ All application code, UI components, and business logic were written specificall
 
 The app consumes the following endpoint:
 
-- **Main Data**: `https://s3.amazonaws.com/sq-mobile-interview/employees.json`y.json`
+- **Main Data**: `https://s3.amazonaws.com/sq-mobile-interview/employees.json`
 
 ## Data Model
 
@@ -245,8 +245,3 @@ data class Employee(
 
 ---
 
-## Contact
-
-For questions about this implementation, please reach out through the interview process.
-
-**Note**: This project was built as part of the Square mobile engineering interview process and demonstrates Android development best practices and clean architecture principles.
