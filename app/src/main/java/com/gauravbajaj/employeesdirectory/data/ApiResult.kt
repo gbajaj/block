@@ -16,6 +16,11 @@ sealed class ApiException(
     cause: Throwable? = null
 ) : Exception(technicalMessage, cause) {
 
+    object NoNetworkException : ApiException(
+        userMessage = "No internet connection. Please check your network and try again.",
+        technicalMessage = "No network connectivity detected"
+    )
+
     data class NetworkException(
         val originalException: Throwable
     ) : ApiException(

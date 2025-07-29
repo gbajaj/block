@@ -57,12 +57,12 @@ fun EmployeeListScreen(
     val pullRefreshState = rememberPullRefreshState(
         refreshing = uiState is UIState.Loading,
         onRefresh = {
-            viewModel.loadEmployees()
+            viewModel.initiateEmployeeLoading()
         }
     )
     LaunchedEffect(uiState) {
         if (uiState is UIState.Initial) {
-            viewModel.loadEmployees()
+            viewModel.initiateEmployeeLoading()
         }
     }
     Scaffold(
@@ -105,7 +105,7 @@ fun EmployeeListScreen(
                     if (successState.data.isEmpty()) {
                         EmptyState(
                             {
-                                viewModel.loadEmployees()
+                                viewModel.initiateEmployeeLoading()
                             },
                             modifier = Modifier.align(Alignment.Center)
                         )

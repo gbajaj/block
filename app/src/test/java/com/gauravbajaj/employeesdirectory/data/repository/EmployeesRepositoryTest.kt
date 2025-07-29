@@ -22,9 +22,18 @@ import java.net.UnknownHostException
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import com.gauravbajaj.employeesdirectory.data.FakeEmployeesApiService
+import com.gauravbajaj.employeesdirectory.data.network.NetworkConnectivityManager
+import com.gauravbajaj.employeesdirectory.data.network.NetworkStatus
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import org.mockito.Mock
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 class EmployeesRepositoryTest {
 
+    @Mock
+    private lateinit var networkConnectivityManager: NetworkConnectivityManager
     private lateinit var apiService: FakeEmployeesApiService
 
     private lateinit var repository: EmployeesRepository
@@ -116,10 +125,75 @@ class EmployeesRepositoryTest {
 
     @Before
     fun setup() {
+        networkConnectivityManager = mock()
+        whenever(networkConnectivityManager.isNetworkAvailable).thenReturn(true)
+        whenever(networkConnectivityManager.networkStatus).thenReturn(
+            flow { emit(NetworkStatus.Available) }
+        )
         apiService = FakeEmployeesApiService()
-        repository = EmployeesRepository(apiService)
+        repository = EmployeesRepository(apiService, networkConnectivityManager)
     }
 
+    // ===== NETWORK CONNECTIVITY TESTS =====
+    @Test
+    fun `getEmployees should emit no network error when network is unavailable`() = runTest {
+        // Given
+        whenever(networkConnectivityManager.isNetworkAvailable).thenReturn(false)
+
+        // When & Then
+        repository.getEmployees().test {
+            val loadingItem = awaitItem()
+            assertTrue(loadingItem is ApiResult.Loading)
+
+            val errorItem = awaitItem()
+            assertTrue(errorItem is ApiResult.Error)
+            assertTrue(errorItem.exception is ApiException.NoNetworkException)
+            assertEquals(
+                "No internet connection. Please check your network and try again.",
+                errorItem.message
+            )
+
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `getEmployees should proceed with API call when network is available`() = runTest {
+        // Given
+        whenever(networkConnectivityManager.isNetworkAvailable).thenReturn(true)
+        val response = EmployeesResponse(listOf(validEmployee))
+        whenever(apiService.getEmployees()).thenReturn(Response.success(response))
+
+        // When & Then
+        repository.getEmployees().test {
+            val loadingItem = awaitItem()
+            assertTrue(loadingItem is ApiResult.Loading)
+
+            val successItem = awaitItem()
+            assertTrue(successItem is ApiResult.Success)
+            assertEquals(1, successItem.data.size)
+
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `getNetworkStatus should return network status flow`() = runTest {
+        // Given
+        val networkStatusFlow = flowOf(NetworkStatus.Available, NetworkStatus.Unavailable)
+        whenever(networkConnectivityManager.networkStatus).thenReturn(networkStatusFlow)
+
+        // When & Then
+        repository.getNetworkStatus().test {
+            val available = awaitItem()
+            assertEquals(NetworkStatus.Available, available)
+
+            val unavailable = awaitItem()
+            assertEquals(NetworkStatus.Unavailable, unavailable)
+
+            awaitComplete()
+        }
+    }
     // ===== SUCCESS SCENARIOS =====
 
 

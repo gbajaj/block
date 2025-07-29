@@ -1,5 +1,6 @@
 package com.gauravbajaj.employeesdirectory.di
 
+import com.gauravbajaj.employeesdirectory.data.network.NetworkConnectivityManager
 import com.gauravbajaj.employeesdirectory.data.remote.EmployeesApiService
 import com.gauravbajaj.employeesdirectory.data.repository.EmployeesRepository
 import com.squareup.moshi.Moshi
@@ -68,6 +69,7 @@ object AppModule {
     @Singleton
     fun provideUserRepository(
         userApi: EmployeesApiService,
+        networkConnectivityManager: NetworkConnectivityManager
     ): EmployeesRepository =
-        EmployeesRepository(userApi)
+        EmployeesRepository(userApi, networkConnectivityManager)
 }

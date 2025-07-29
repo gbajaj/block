@@ -31,6 +31,7 @@ sealed class UIState<out T> {
             return Error(
                 message = message ?: apiException.userMessage,
                 isRetryable = allowRetry && when (apiException) {
+                    is ApiException.NoNetworkException -> true
                     is ApiException.NetworkException -> true
                     is ApiException.ServerException -> apiException.code in 500..599
                     is ApiException.ParseException -> false

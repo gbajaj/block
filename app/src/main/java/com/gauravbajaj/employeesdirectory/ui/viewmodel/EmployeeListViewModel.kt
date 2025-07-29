@@ -2,8 +2,10 @@ package com.gauravbajaj.employeesdirectory.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gauravbajaj.employeesdirectory.data.ApiException
 import com.gauravbajaj.employeesdirectory.data.ApiResult
 import com.gauravbajaj.employeesdirectory.data.model.Employee
+import com.gauravbajaj.employeesdirectory.data.network.NetworkStatus
 import com.gauravbajaj.employeesdirectory.data.repository.EmployeesRepository
 import com.gauravbajaj.employeesdirectory.ui.base.UIState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,7 +35,28 @@ class EmployeeListViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<UIState<List<Employee>>>(UIState.Initial)
     val uiState: StateFlow<UIState<List<Employee>>> = _uiState
 
-    fun loadEmployees() {
+    // Separate StateFlow for network status
+    private val _networkStatus = MutableStateFlow(NetworkStatus.Available)
+    val networkStatus: StateFlow<NetworkStatus> = _networkStatus
+
+    private fun observeNetworkStatus() {
+        viewModelScope.launch {
+            employeeRepository.getNetworkStatus().collect { networkStatus ->
+                _networkStatus.value = networkStatus
+
+                // Auto-retry if network becomes available and we have a network error
+                if (networkStatus == NetworkStatus.Available) {
+                    val currentState = _uiState.value
+                    if (currentState is UIState.Error && currentState.exception is ApiException.NoNetworkException) {
+                        autoRetryCount = 0 // Reset retry count
+                        loadEmployees()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun loadEmployees() {
         viewModelScope.launch {
             employeeRepository.getEmployees().collect { result ->
                 when (result) {
@@ -43,6 +66,7 @@ class EmployeeListViewModel @Inject constructor(
 
                     is ApiResult.Success -> {
                         autoRetryCount = 0 // Reset retry count on success
+                        manualRetryCount = 0 // Reset manual retry count on success
                         _uiState.value = UIState.success(result.data)
                     }
 
@@ -61,13 +85,14 @@ class EmployeeListViewModel @Inject constructor(
             autoRetryCount = 0  // Reset auto-retry when user manually retries
             loadEmployees()
         } else {
-            // Show different message after max retries
-            val errorState = _uiState.value as UIState.Error
-            UIState.error(
-                errorState.exception,
-                false,
-                "Unable to load employees after multiple attempts. Please check your connection and try again later."
-            )
+            val currentState = _uiState.value
+            if (currentState is UIState.Error) {
+                _uiState.value = UIState.error(
+                    currentState.exception,
+                    allowRetry = false,
+                    message = "Unable to load employees after multiple attempts. Please check your connection and try again later."
+                )
+            }
         }
     }
 
@@ -81,6 +106,14 @@ class EmployeeListViewModel @Inject constructor(
                 loadEmployees()
             }
         }
+    }
+
+    /**
+     * Calls observeNetworkStatus and loadEmployees together to initiate both flows.
+     */
+    fun initiateEmployeeLoading() {
+        observeNetworkStatus()
+        loadEmployees()
     }
 
     companion object {

@@ -15,8 +15,10 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
 import com.gauravbajaj.employeesdirectory.data.ApiException
+import com.gauravbajaj.employeesdirectory.data.network.NetworkConnectivityManager
 import com.squareup.moshi.JsonDataException
 
+import android.util.Log
 
 /**
  * Repository for fetching user data.
@@ -31,9 +33,15 @@ import com.squareup.moshi.JsonDataException
 @Singleton
 class EmployeesRepository @Inject constructor(
     private val employeesApi: EmployeesApiService,
+    private val networkConnectivityManager: NetworkConnectivityManager
 ) {
     fun getEmployees(): Flow<ApiResult<List<Employee>>> = flow {
         emit(ApiResult.Loading())
+        // Check network connectivity first
+        if (!networkConnectivityManager.isNetworkAvailable) {
+            emit(ApiResult.Error(ApiException.NoNetworkException))
+            return@flow
+        }
         try {
             val response = employeesApi.getEmployees()
             if (response.isSuccessful) {
@@ -48,10 +56,11 @@ class EmployeesRepository @Inject constructor(
                 }
 
                 if (validEmployees.size != employees.size) {
+                    val invalidCount = employees.size - validEmployees.size
                     emit(
                         ApiResult.Error(
                             ApiException.ParseException(
-                                IllegalStateException("Some employee records are malformed")
+                                IllegalStateException("$invalidCount employee records are malformed")
                             )
                         )
                     )
@@ -74,6 +83,7 @@ class EmployeesRepository @Inject constructor(
                     code = e.code(),
                     serverMessage = e.message()
                 )
+
                 is UnknownHostException,
                 is ConnectException -> ApiException.NetworkException(e)
 
@@ -86,4 +96,9 @@ class EmployeesRepository @Inject constructor(
         }
     }
 
+    fun getNetworkStatus() = networkConnectivityManager.networkStatus
+
+    companion object {
+        private const val TAG = "EmployeesRepository"
+    }
 }
